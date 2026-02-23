@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact Form</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf8f5;
+    --card: #ffffff;
+    --accent: #c45d3e;
+    --accent-light: #e8735a;
+    --accent-bg: rgba(196, 93, 62, 0.06);
+    --text: #2c2825;
+    --text-dim: #8a8280;
+    --border: #e8e2dd;
+    --border-focus: #c45d3e;
+    --input-bg: #faf8f5;
+    --success: #3a7d5c;
+    --shadow: rgba(44, 40, 37, 0.06);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    background-image:
+      radial-gradient(ellipse at 0% 0%, rgba(196, 93, 62, 0.05) 0%, transparent 60%),
+      radial-gradient(ellipse at 100% 100%, rgba(196, 93, 62, 0.03) 0%, transparent 60%);
+    font-family: 'Sora', sans-serif;
+    color: var(--text);
+    padding: 24px;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 520px;
+    animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .header {
+    margin-bottom: 32px;
+  }
+
+  .header .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-bg);
+    padding: 6px 14px;
+    border-radius: 100px;
+    margin-bottom: 16px;
+  }
+
+  .header h1 {
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 1.2;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+
+  .header p {
+    font-size: 15px;
+    color: var(--text-dim);
+    font-weight: 300;
+    line-height: 1.6;
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 36px;
+    box-shadow:
+      0 1px 3px var(--shadow),
+      0 8px 30px var(--shadow);
+    border: 1px solid var(--border);
+  }
+
+  .field {
+    margin-bottom: 24px;
+    position: relative;
+  }
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+
+  label .required {
+    color: var(--accent);
+    margin-left: 2px;
+  }
+
+  input, textarea {
+    width: 100%;
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--text);
+    background: var(--input-bg);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    outline: none;
+    transition: all 0.2s ease;
+  }
+
+  input::placeholder, textarea::placeholder {
+    color: var(--text-dim);
+    font-weight: 300;
+  }
+
+  input:focus, textarea:focus {
+    border-color: var(--border-focus);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(196, 93, 62, 0.08);
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 130px;
+    line-height: 1.6;
+  }
+
+  .error-msg {
+    font-size: 12px;
+    color: var(--accent);
+    margin-top: 6px;
+    display: none;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .error-msg.show { display: flex; }
+
+  .field.error input,
+  .field.error textarea {
+    border-color: var(--accent);
+    background: rgba(196, 93, 62, 0.02);
+  }
+
+  .char-count {
+    position: absolute;
+    right: 0;
+    top: 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  button {
+    width: 100%;
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: #fff;
+    background: var(--accent);
+    border: none;
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    margin-top: 4px;
+  }
+
+  button:hover { background: var(--accent-light); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(196, 93, 62, 0.25); }
+  button:active { transform: translateY(0); box-shadow: none; }
+
+  button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .btn-text { transition: opacity 0.2s; }
+  .btn-loader {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  button.loading .btn-text { opacity: 0; }
+  button.loading .btn-loader { opacity: 1; }
+
+  .spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Success state */
+  .success-state {
+    display: none;
+    text-align: center;
+    padding: 40px 20px;
+  }
+
+  .success-state.show { display: block; }
+  .form-fields.hidden { display: none; }
+
+  .success-icon {
+    width: 64px;
+    height: 64px;
+    background: rgba(58, 125, 92, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    animation: popIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes popIn {
+    from { transform: scale(0); }
+    to { transform: scale(1); }
+  }
+
+  .success-icon svg { width: 28px; height: 28px; color: var(--success); }
+
+  .success-state h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .success-state p {
+    font-size: 14px;
+    color: var(--text-dim);
+    margin-bottom: 24px;
+    line-height: 1.6;
+  }
+
+  .reset-link {
+    font-size: 14px;
+    color: var(--accent);
+    cursor: pointer;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  .reset-link:hover { color: var(--accent-light); }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <span class="tag">Get in Touch</span>
+    <h1>Send a message</h1>
+    <p>Have a question or want to work together? Fill out the form below and we'll get back to you shortly.</p>
+  </div>
+
+  <div class="card">
+    <div class="form-fields" id="formFields">
+      <div class="field" id="nameField">
+        <label>Name <span class="required">*</span></label>
+        <input type="text" id="name" placeholder="Your full name" autocomplete="name">
+        <div class="error-msg" id="nameError">Please enter your name</div>
+      </div>
+
+      <div class="field" id="emailField">
+        <label>Email <span class="required">*</span></label>
+        <input type="email" id="email" placeholder="you@example.com" autocomplete="email">
+        <div class="error-msg" id="emailError">Please enter a valid email address</div>
+      </div>
+
+      <div class="field" id="messageField">
+        <label>Message <span class="required">*</span></label>
+        <span class="char-count" id="charCount">0 / 500</span>
+        <textarea id="message" placeholder="What's on your mind?" maxlength="500"></textarea>
+        <div class="error-msg" id="messageError">Please enter a message</div>
+      </div>
+
+      <button id="submitBtn" onclick="submitForm()">
+        <span class="btn-text">Send Message</span>
+        <span class="btn-loader"><span class="spinner"></span></span>
+      </button>
+    </div>
+
+    <div class="success-state" id="successState">
+      <div class="success-icon">
+        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+        </svg>
+      </div>
+      <h2>Message sent!</h2>
+      <p>Thanks for reaching out. We'll get back to you as soon as we can.</p>
+      <a class="reset-link" onclick="resetForm()">Send another message</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  const nameInput = document.getElementById('name');
+  const emailInput = document.getElementById('email');
+  const messageInput = document.getElementById('message');
+  const charCount = document.getElementById('charCount');
+
+  // Live character count
+  messageInput.addEventListener('input', () => {
+    const len = messageInput.value.length;
+    charCount.textContent = `${len} / 500`;
+    charCount.style.color = len > 450 ? 'var(--accent)' : 'var(--text-dim)';
+  });
+
+  // Clear errors on input
+  [nameInput, emailInput, messageInput].forEach(el => {
+    el.addEventListener('input', () => {
+      el.closest('.field').classList.remove('error');
+      el.closest('.field').querySelector('.error-msg').classList.remove('show');
+    });
+  });
+
+  function validateEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  function showError(fieldId, errorId) {
+    document.getElementById(fieldId).classList.add('error');
+    document.getElementById(errorId).classList.add('show');
+  }
+
+  function submitForm() {
+    let valid = true;
+
+    if (!nameInput.value.trim()) { showError('nameField', 'nameError'); valid = false; }
+    if (!validateEmail(emailInput.value.trim())) { showError('emailField', 'emailError'); valid = false; }
+    if (!messageInput.value.trim()) { showError('messageField', 'messageError'); valid = false; }
+
+    if (!valid) return;
+
+    const btn = document.getElementById('submitBtn');
+    btn.classList.add('loading');
+    btn.disabled = true;
+
+    // =============================================
+    // SETUP: Replace YOUR_FORM_ID with your actual
+    // Formspree form ID (e.g. "xpzvqkla")
+    // Get one free at https://formspree.io
+    // =============================================
+    const FORMSPREE_ID = "YOUR_FORM_ID";
+
+    fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: nameInput.value.trim(),
+        email: emailInput.value.trim(),
+        message: messageInput.value.trim()
+      })
+    })
+    .then(response => {
+      btn.classList.remove('loading');
+      btn.disabled = false;
+
+      if (response.ok) {
+        document.getElementById('formFields').classList.add('hidden');
+        document.getElementById('successState').classList.add('show');
+      } else {
+        alert("Something went wrong. Please try again.");
+      }
+    })
+    .catch(error => {
+      btn.classList.remove('loading');
+      btn.disabled = false;
+      alert("Could not connect. Please check your internet and try again.");
+    });
+  }
+
+  function resetForm() {
+    nameInput.value = '';
+    emailInput.value = '';
+    messageInput.value = '';
+    charCount.textContent = '0 / 500';
+    charCount.style.color = 'var(--text-dim)';
+    document.getElementById('formFields').classList.remove('hidden');
+    document.getElementById('successState').classList.remove('show');
+  }
+</script>
+
+</body>
+</html>
